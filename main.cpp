@@ -26,8 +26,6 @@ std::vector <double> mesh (double left_border, const double & right_border, cons
 
 std::vector<double> function_nodes (std::vector<double> & xx, double f(double & x));
 
-double potential (double & x);
-
 std::vector<double> random_shift (std::vector<double> f, const double & max_shift);
 
 double Energy (std::vector<double> & x, std::vector<double> & f);
@@ -137,7 +135,7 @@ std::vector <double> mesh (double left_border, const double & right_border, cons
 }
 
 
-// Below are technical functions that are not related to the solution.
+// There are technical functions that are not related to the solution below.
 
 
 std::vector<data> data_collection (std::vector<double> & x, std::vector<double> & f) {
