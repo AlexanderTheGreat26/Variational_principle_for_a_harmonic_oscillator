@@ -59,6 +59,7 @@ int main () {
     } while (E_GS > 0.5);
     data_file_creation("result_function", data_collection(x_mesh, f_mesh));
     plot("result_function", -10, 10, "Result function", "x", "psi");
+    return 0;
 }
 
 
@@ -100,7 +101,7 @@ double mean_hamiltonian (std::vector<double> & x, std::vector<double> & f) {
 // Returns <f|f>
 double normalization (std::vector<double> & function) {
     double sum = 0;
-    for (double f : function)
+    for (double & f : function)
         sum += std::pow(f, 2);
     return sum;
 }
