@@ -31,7 +31,6 @@ double energy (std::vector<double> & x, std::vector<double> & f);
 
 void data_file_creation (const std::string & name, std::vector<double> & x, std::vector<double> & y);
 
-
 void plot (const std::string & name, const int & left, const int & right,
            const std::string & title, const std::string & xlabel, const std::string & ylabel);
 
