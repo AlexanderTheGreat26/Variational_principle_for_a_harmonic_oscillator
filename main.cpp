@@ -4,16 +4,12 @@
 #include <utility>
 #include <fstream>
 #include <string>
-#include <tuple>
 #include <array>
 #include <algorithm>
 #include <sstream>
 
 
 const double mesh_step = 0.01;
-
-
-typedef std::pair<double, double> data;
 
 
 std::random_device rd;  // Will be used to obtain a seed for the random number engine.
@@ -28,14 +24,13 @@ std::vector<double> function_nodes (std::vector<double> & xx, double f(double & 
 
 std::vector<double> random_shift (std::vector<double> f, const double & max_shift);
 
-double Energy (std::vector<double> & x, std::vector<double> & f);
+double energy (std::vector<double> & x, std::vector<double> & f);
 
 
 // Technical functions.
 
-std::vector<data> data_collection (std::vector<double> & x, std::vector<double> & f);
+void data_file_creation (const std::string & name, std::vector<double> & x, std::vector<double> & y);
 
-void data_file_creation (const std::string & name, const std::vector<data> &exp_data);
 
 void plot (const std::string & name, const int & left, const int & right,
            const std::string & title, const std::string & xlabel, const std::string & ylabel);
@@ -45,31 +40,29 @@ void plot (const std::string & name, const int & left, const int & right,
 int main () {
     std::vector<double> x_mesh = std::move(mesh(-10, 10, mesh_step));
     std::vector<double> f_mesh = std::move(function_nodes(x_mesh, trial_function));
-    data_file_creation("trial_function", data_collection(x_mesh, f_mesh));
+    data_file_creation("trial_function", x_mesh, f_mesh);
     plot("trial_function", -10, 10, "Trial function", "x", "psi");
-    double E, E_GS = Energy(x_mesh, f_mesh);
+    double E, E_GS = energy(x_mesh, f_mesh);
     do {
         std::vector<double> f_buf = std::move(random_shift(f_mesh, 0.1));
-        E = Energy(x_mesh, f_buf);
+        E = energy(x_mesh, f_buf);
         if (E <= E_GS) {
             E_GS = E;
             f_mesh = std::move(f_buf);
         }
         std::cout << E_GS << std::endl;
     } while (E_GS > 0.5);
-    data_file_creation("result_function", data_collection(x_mesh, f_mesh));
+    data_file_creation("result_function", x_mesh, f_mesh);
     plot("result_function", -10, 10, "Result function", "x", "psi");
     return 0;
 }
 
 
-// Returns table-function (std::vector<double> f) with random shifted (shift) random point (num).
+// Returns table-function (std::vector<double> f) with random shifted (dis_shift) random point (dis_num).
 std::vector<double> random_shift (std::vector<double> f, const double & max_shift) {
     std::uniform_int_distribution<> dis_num (1, f.size()-2);
     std::uniform_real_distribution<double> dis_shift (-max_shift, max_shift);
-    int num = dis_num(gen);
-    double shift = dis_shift(gen);
-    f[num] += shift;
+    f[dis_num(gen)] += dis_shift(gen);
     return f;
 }
 
@@ -108,7 +101,7 @@ double normalization (std::vector<double> & function) {
 
 
 // Returns E = <f|H|f> / <f|f>
-double Energy (std::vector<double> & x, std::vector<double> & f) {
+double energy (std::vector<double> & x, std::vector<double> & f) {
     return mean_hamiltonian(x, f) / normalization(f);
 }
 
@@ -139,14 +132,6 @@ std::vector <double> mesh (double left_border, const double & right_border, cons
 // There are technical functions that are not related to the solution below.
 
 
-std::vector<data> data_collection (std::vector<double> & x, std::vector<double> & f) {
-    std::vector<data> collected (x.size());
-    for (int i = 0; i < x.size(); ++i)
-        collected[i] = std::move(std::make_pair(x[i], f[i]));
-    return collected;
-}
-
-
 // Returns std::string from numeric type (std::to_string not safe enough).
 template <typename T>
 std::string toString (T val) {
@@ -156,25 +141,12 @@ std::string toString (T val) {
 }
 
 
-// Returns std::string with numeric tuple in it.
-template<typename T, size_t... Is>
-std::string tuple_to_string_impl (T const& t, std::index_sequence<Is...>) {
-    return ((toString(std::get<Is>(t)) + '\t') + ...);
-}
-
-template <class Tuple>
-std::string tuple_to_string (const Tuple& t) {
-    constexpr auto size = std::tuple_size<Tuple>{};
-    return tuple_to_string_impl(t, std::make_index_sequence<size>{});
-}
-
-
-// Creates text file (.txt) with given name from std::vector of numeric tuples.
-void data_file_creation (const std::string & name, const std::vector<data> &exp_data) {
+// Creates text file (.txt) from with coordinates (x, y) for plotting.
+void data_file_creation (const std::string & name, std::vector<double> & x, std::vector<double> & y) {
     std::ofstream fout;
     fout.open(name + ".txt", std::ios::out | std::ios::trunc);
-    for (auto & i : exp_data)
-        fout << tuple_to_string(i) << std::endl;
+    for (int i = 0; i < x.size(); ++i)
+        fout << toString(x[i]) << '\t' << toString(y[i]) << std::endl;
     fout.close();
 }
 
