@@ -18,8 +18,6 @@ std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd().
 
 double trial_function (double & x);
 
-std::vector <double> mesh (double left_border, const double & right_border, const double & step);
-
 std::vector<double> function_nodes (std::vector<double> & xx, double f(double & x));
 
 std::vector<double> random_shift (std::vector<double> f, const double & max_shift);
@@ -28,6 +26,8 @@ double energy (std::vector<double> & x, std::vector<double> & f);
 
 
 // Technical functions.
+
+std::vector <double> mesh (double left_border, const double & right_border, const double & step);
 
 void data_file_creation (const std::string & name, std::vector<double> & x, std::vector<double> & y);
 
@@ -120,15 +120,15 @@ std::vector<double> function_nodes (std::vector<double> & xx, double f(double & 
 }
 
 
+// There are technical functions that are not related to the solution below.
+
 // Creates mesh from left border to right border with given step.
 std::vector <double> mesh (double left_border, const double & right_border, const double & step) {
     std::vector <double> xx ((right_border-left_border) / step);
-    std::generate(xx.begin(), xx.end(), [&] {left_border += step; return left_border;});
+    xx[0] = left_border;
+    std::generate(xx.begin()+1, xx.end(), [&] {left_border += step; return left_border;});
     return xx;
 }
-
-
-// There are technical functions that are not related to the solution below.
 
 
 // Returns std::string from numeric type (std::to_string not safe enough).
