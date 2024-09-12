@@ -107,7 +107,7 @@ double energy (std::vector<double> & x, std::vector<double> & f) {
 
 // Returns the trial function value at point x.
 double trial_function (double & x) {
-    return (std::fabs(x) <= 0.5) ? 1 : 0;
+    return (std::fabs(x) - 0.5 < std::numeric_limits<double>::epsilon()) ? 1 : 0;
 }
 
 
