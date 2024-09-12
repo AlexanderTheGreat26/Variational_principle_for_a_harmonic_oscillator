@@ -124,7 +124,7 @@ std::vector<double> function_nodes (std::vector<double> & xx, double f(double & 
 
 // Creates mesh from left border to right border with given step.
 std::vector <double> mesh (double left_border, const double & right_border, const double & step) {
-    std::vector <double> xx ((right_border-left_border) / step);
+    std::vector <double> xx ((right_border-left_border) / step + 1);
     xx[0] = left_border;
     std::generate(xx.begin()+1, xx.end(), [&] {left_border += step; return left_border;});
     return xx;
