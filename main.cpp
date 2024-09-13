@@ -9,7 +9,7 @@
 #include <sstream>
 
 
-const double mesh_step = 0.01;
+const double mesh_step = 0.1;
 
 
 std::random_device rd;  // Will be used to obtain a seed for the random number engine.
@@ -43,7 +43,7 @@ int main () {
     plot("trial_function", -10, 10, "Trial function", "x", "psi");
     double E, E_GS = energy(x_mesh, f_mesh);
     do {
-        std::vector<double> f_buf = std::move(random_shift(f_mesh, 0.1));
+        std::vector<double> f_buf = std::move(random_shift(f_mesh, 0.01));
         E = energy(x_mesh, f_buf);
         if (E <= E_GS) {
             E_GS = E;
